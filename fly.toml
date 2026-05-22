@@ -1,0 +1,23 @@
+# fly.toml — Fly.io config for Claudendar
+# IMPORTANT: `app` must be globally unique across all of Fly.
+# Pick your own name before running `fly launch` or `fly apps create`.
+
+app = "claudendar"
+primary_region = "iad"   # change to your nearest Fly region (sjc, lhr, nrt, etc.)
+
+[build]
+  dockerfile = "Dockerfile"
+
+# No HTTP service — this is a long-polling Telegram bot.
+# Always keep one instance running.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+[processes]
+  app = "node dist/index.js"
+
+# Set secrets via:
+#   fly secrets set TELEGRAM_BOT_TOKEN=... ANTHROPIC_API_KEY=... \
+#                   ICLOUD_USERNAME=... ICLOUD_APP_PASSWORD=... \
+#                   USER_TIMEZONE=America/Los_Angeles ALLOWED_CHAT_IDS=...
