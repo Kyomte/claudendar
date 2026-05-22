@@ -117,6 +117,7 @@ All configuration is via environment variables (loaded from `.env` locally or se
 | `ICLOUD_CALENDAR_NAME` | optional | Default calendar for new events. Defaults to first writable. |
 | `ICLOUD_REMINDER_LIST_NAME` | optional | Default reminder list. Defaults to first. |
 | `MAX_HISTORY_MESSAGES` | optional | Conversation history cap per chat. Default `20`. |
+| `CLAUDE_MODEL` | optional | Anthropic model. Defaults to `claude-sonnet-4-6`. Set to `claude-haiku-4-5` for cheaper/faster responses (recommended for personal use). |
 
 ## Telegram Commands
 

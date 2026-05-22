@@ -37,7 +37,7 @@ async function callWithBackoff<T>(fn: () => Promise<T>, label: string): Promise<
   throw lastErr;
 }
 
-const MODEL = 'claude-sonnet-4-6';
+const MODEL = process.env.CLAUDE_MODEL?.trim() || 'claude-sonnet-4-6';
 const MAX_TOKENS = 4096;
 const MAX_TOOL_ROUNDS = 8;
 
