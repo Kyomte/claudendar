@@ -25,14 +25,32 @@ function getHistory(chatId: number): MessageParam[] {
   return fresh;
 }
 
+function isRealUserMessage(m: MessageParam): boolean {
+  if (m.role !== 'user') return false;
+  if (typeof m.content === 'string') return true;
+  if (Array.isArray(m.content)) {
+    // A "real" user input contains no tool_result blocks.
+    // tool_result-bearing messages are replies to assistant tool_use and
+    // can't appear without a preceding tool_use turn.
+    return !m.content.some(
+      (b) => typeof b === 'object' && b !== null && 'type' in b && b.type === 'tool_result',
+    );
+  }
+  return true;
+}
+
 function pruneHistory(messages: MessageParam[]): MessageParam[] {
   if (messages.length <= MAX_HISTORY) return messages;
-  let pruned = messages.slice(messages.length - MAX_HISTORY);
-  const firstUserIdx = pruned.findIndex((m) => m.role === 'user');
-  if (firstUserIdx > 0) {
-    pruned = pruned.slice(firstUserIdx);
+  const trimmed = messages.slice(messages.length - MAX_HISTORY);
+  // Find first message that's a real user input — guarantees the Anthropic
+  // API invariant that the conversation starts with a user turn AND that any
+  // tool_result block has its matching tool_use in the previous assistant turn.
+  const firstRealUserIdx = trimmed.findIndex(isRealUserMessage);
+  if (firstRealUserIdx === -1) {
+    // Trim window contained no real user input — keep the original to be safe.
+    return messages;
   }
-  return pruned;
+  return trimmed.slice(firstRealUserIdx);
 }
 
 export function createBot(token: string): Telegraf {
